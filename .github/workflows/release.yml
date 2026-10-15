@@ -1,0 +1,31 @@
+name: Build and Release DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile and Build DMG
+        run: |
+          chmod +x build.sh create_dmg.sh
+          ./build.sh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: Bloc de notas.dmg
+          draft: false
+          prerelease: false
+          generate_release_notes: true

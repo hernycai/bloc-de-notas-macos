@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Build artifacts
+Bloc de notas
+Bloc de notas.app/
+dmg_staging/
+test*
+*.log
