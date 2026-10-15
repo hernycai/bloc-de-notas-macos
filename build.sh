@@ -27,11 +27,7 @@ cp AppIcon.icns "$APP_DIR/Contents/Resources/AppIcon.icns"
 echo "==> Firmando aplicación..."
 codesign --force --deep --sign - "$APP_DIR"
 
-echo "==> Instalando en /Applications/Bloc de notas.app..."
-rm -rf "/Applications/$APP_DIR"
-cp -R "$APP_DIR" "/Applications/"
-
-echo "==> ✅ Éxito: Bloc de notas está listo y disponible en /Applications!"
+echo "==> ✅ Éxito: Bloc de notas.app empaquetado localmente!"
 
 echo "==> Generando instalador DMG..."
 ./create_dmg.sh
