@@ -25,6 +25,22 @@ Puedes abrirla de cualquiera de las siguientes maneras:
 
 ---
 
+## 🍺 Instalación con Homebrew o CaskHub
+
+### Vía Homebrew (Terminal)
+
+```bash
+brew install hernycai/tap/bloc-de-notas
+```
+
+### Vía CaskHub (Interfaz Gráfica)
+
+1. Abre [CaskHub](https://caskhub.app/).
+2. Ve a la sección **Manage ▸ Taps** y añade: `hernycai/tap`.
+3. Busca **Bloc de notas** e instálalo con un solo clic.
+
+---
+
 ## 🎨 Características y Detalles de Réplica
 
 - **Barra de menús integrada con seguimiento continuo del cursor**:
@@ -105,4 +121,4 @@ Para recompilar, reinstalar y generar el DMG en un solo paso, ejecuta:
 ./build.sh
 ```
 
-El script compila el código Swift nativo, empaqueta la aplicación con sus recursos, la firma, la instala en `/Applications/Bloc de notas.app` y genera `Bloc de notas.dmg`.
+El script compila el código Swift nativo, empaqueta la aplicación con sus recursos, la firma y genera el instalador `Bloc de notas.dmg`.
