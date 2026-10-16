@@ -31,31 +31,49 @@ class FormatToolbarButton: NSButton {
     private func commonInit() {
         wantsLayer = true
         isBordered = false
-        layer?.cornerRadius = 3.0
+        layer?.cornerRadius = 4.0
         layer?.borderWidth = 1.0
         updateStyle()
     }
     
     func updateStyle() {
         let isDark = ThemeManager.shared.isDark
-        let borderCol = isDark ? NSColor(calibratedWhite: 0.4, alpha: 1.0) : NSColor(calibratedWhite: 0.72, alpha: 1.0)
-        let textCol = isDark ? NSColor.white : NSColor(calibratedWhite: 0.1, alpha: 1.0)
+        let buttonTextCol: NSColor
         
         if isToggledOn {
-            let activeBg = isDark ? NSColor(calibratedRed: 0.20, green: 0.38, blue: 0.65, alpha: 1.0) : NSColor(calibratedRed: 0.78, green: 0.88, blue: 0.98, alpha: 1.0)
-            layer?.backgroundColor = activeBg.cgColor
-            layer?.borderColor = NSColor(calibratedRed: 0.10, green: 0.45, blue: 0.85, alpha: 1.0).cgColor
+            if isDark {
+                // Modo Oscuro: El botón se pone en BLANCO con texto NEGRO intenso
+                layer?.backgroundColor = NSColor(calibratedWhite: 0.96, alpha: 1.0).cgColor
+                layer?.borderColor = NSColor.white.cgColor
+                layer?.borderWidth = 1.5
+                buttonTextCol = NSColor.black
+            } else {
+                // Modo Claro: El botón se oscurece a NEGRO con texto BLANCO
+                layer?.backgroundColor = NSColor(calibratedWhite: 0.15, alpha: 1.0).cgColor
+                layer?.borderColor = NSColor(calibratedWhite: 0.05, alpha: 1.0).cgColor
+                layer?.borderWidth = 1.5
+                buttonTextCol = NSColor.white
+            }
         } else {
-            let normalBg = isDark ? NSColor(calibratedWhite: 0.25, alpha: 1.0) : NSColor(calibratedWhite: 0.98, alpha: 1.0)
-            layer?.backgroundColor = normalBg.cgColor
-            layer?.borderColor = borderCol.cgColor
+            layer?.borderWidth = 1.0
+            if isDark {
+                // Modo Oscuro inactivo: gris oscuro con texto blanco suave
+                layer?.backgroundColor = NSColor(calibratedWhite: 0.22, alpha: 1.0).cgColor
+                layer?.borderColor = NSColor(calibratedWhite: 0.38, alpha: 1.0).cgColor
+                buttonTextCol = NSColor(calibratedWhite: 0.92, alpha: 1.0)
+            } else {
+                // Modo Claro inactivo: blanco/gris suave con texto oscuro
+                layer?.backgroundColor = NSColor(calibratedWhite: 0.96, alpha: 1.0).cgColor
+                layer?.borderColor = NSColor(calibratedWhite: 0.75, alpha: 1.0).cgColor
+                buttonTextCol = NSColor(calibratedWhite: 0.15, alpha: 1.0)
+            }
         }
         
         let pstyle = NSMutableParagraphStyle()
         pstyle.alignment = .center
         let attrs: [NSAttributedString.Key: Any] = [
             .font: self.font ?? NSFont.systemFont(ofSize: 12),
-            .foregroundColor: textCol,
+            .foregroundColor: buttonTextCol,
             .paragraphStyle: pstyle
         ]
         self.attributedTitle = NSAttributedString(string: self.title, attributes: attrs)
@@ -209,13 +227,37 @@ class FormatToolbar: NSView {
         }
     }
     
-    @objc private func onBold() { delegate?.formatDidToggleBold() }
-    @objc private func onItalic() { delegate?.formatDidToggleItalic() }
-    @objc private func onStrike() { delegate?.formatDidToggleStrikethrough() }
-    @objc private func onUnderline() { delegate?.formatDidToggleUnderline() }
+    func setStyleState(bold: Bool, italic: Bool, strikethrough: Bool, underline: Bool) {
+        if boldButton.isToggledOn != bold { boldButton.isToggledOn = bold }
+        if italicButton.isToggledOn != italic { italicButton.isToggledOn = italic }
+        if strikeButton.isToggledOn != strikethrough { strikeButton.isToggledOn = strikethrough }
+        if underlineButton.isToggledOn != underline { underlineButton.isToggledOn = underline }
+    }
+    
+    @objc private func onBold() {
+        boldButton.isToggledOn.toggle()
+        delegate?.formatDidToggleBold()
+    }
+    
+    @objc private func onItalic() {
+        italicButton.isToggledOn.toggle()
+        delegate?.formatDidToggleItalic()
+    }
+    
+    @objc private func onStrike() {
+        strikeButton.isToggledOn.toggle()
+        delegate?.formatDidToggleStrikethrough()
+    }
+    
+    @objc private func onUnderline() {
+        underlineButton.isToggledOn.toggle()
+        delegate?.formatDidToggleUnderline()
+    }
+    
     @objc private func onMarkdownToggled() {
         delegate?.formatDidToggleMarkdownMode(markdownCheck.state == .on)
     }
+    
     @objc private func onThemeToggle() {
         delegate?.formatDidToggleTheme()
     }

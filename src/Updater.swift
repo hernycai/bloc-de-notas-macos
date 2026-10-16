@@ -3,7 +3,7 @@ import AppKit
 class AppUpdater {
     static let shared = AppUpdater()
     
-    let currentVersion = "1.2.1"
+    let currentVersion = "1.2.2"
     let githubRepo = "hernycai/bloc-de-notas-macos"
     
     var repoURL: URL {

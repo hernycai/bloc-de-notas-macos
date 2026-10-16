@@ -103,6 +103,7 @@ class NotepadWindowController: NSWindowController, NSWindowDelegate, InWindowMen
         
         window.initialFirstResponder = textView
         relayoutViews()
+        textView.updateFormattingState()
     }
     
     @objc func configDidChange() {
@@ -267,6 +268,10 @@ class NotepadWindowController: NSWindowController, NSWindowDelegate, InWindowMen
                 self.loadFile(url: url)
             }
         }
+    }
+    
+    func textViewDidChangeFormatting(bold: Bool, italic: Bool, strikethrough: Bool, underline: Bool) {
+        formatToolbar.setStyleState(bold: bold, italic: italic, strikethrough: strikethrough, underline: underline)
     }
     
     // MARK: - InWindowMenuBarDelegate
@@ -572,18 +577,22 @@ class NotepadWindowController: NSWindowController, NSWindowDelegate, InWindowMen
     
     func formatDidToggleBold() {
         textView.toggleBold(markdownMode: formatToolbar.markdownCheck.state == .on)
+        textView.updateFormattingState()
     }
     
     func formatDidToggleItalic() {
         textView.toggleItalic(markdownMode: formatToolbar.markdownCheck.state == .on)
+        textView.updateFormattingState()
     }
     
     func formatDidToggleStrikethrough() {
         textView.toggleStrikethrough(markdownMode: formatToolbar.markdownCheck.state == .on)
+        textView.updateFormattingState()
     }
     
     func formatDidToggleUnderline() {
         textView.toggleUnderline(markdownMode: formatToolbar.markdownCheck.state == .on)
+        textView.updateFormattingState()
     }
     
     func formatDidToggleMarkdownMode(_ isMarkdown: Bool) {

@@ -4,6 +4,7 @@ protocol NotepadTextViewDelegate: AnyObject {
     func textViewDidChangeCursorPosition(line: Int, column: Int)
     func textViewDidChangeContent()
     func textViewDidRequestOpenURL(_ url: URL)
+    func textViewDidChangeFormatting(bold: Bool, italic: Bool, strikethrough: Bool, underline: Bool)
 }
 
 class NotepadTextView: NSTextView {
@@ -114,11 +115,13 @@ class NotepadTextView: NSTextView {
     override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
         super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
         updateCursorPosition()
+        updateFormattingState()
     }
     
     override func didChangeText() {
         super.didChangeText()
         updateCursorPosition()
+        updateFormattingState()
         notepadDelegate?.textViewDidChangeContent()
     }
     
@@ -133,6 +136,48 @@ class NotepadTextView: NSTextView {
         let col = (lines.last?.utf16.count ?? 0) + 1
         
         notepadDelegate?.textViewDidChangeCursorPosition(line: line, column: col)
+    }
+    
+    func updateFormattingState() {
+        let range = selectedRange()
+        let attrs: [NSAttributedString.Key: Any]
+        if range.length > 0, let textStorage = self.textStorage, range.location < textStorage.length {
+            attrs = textStorage.attributes(at: range.location, effectiveRange: nil)
+        } else {
+            attrs = typingAttributes
+        }
+        
+        let currentFont = (attrs[.font] as? NSFont) ?? self.font ?? ThemeManager.shared.editorFont(size: baseFontSize)
+        let traits = NSFontManager.shared.traits(of: currentFont)
+        var isBold = traits.contains(.boldFontMask)
+        var isItalic = traits.contains(.italicFontMask)
+        
+        let strikeVal = (attrs[.strikethroughStyle] as? Int) ?? 0
+        var isStrike = strikeVal != 0
+        
+        let underVal = (attrs[.underlineStyle] as? Int) ?? 0
+        var isUnder = underVal != 0
+        
+        if range.length > 0 {
+            let fullText = (self.string as NSString)
+            if range.location + range.length <= fullText.length {
+                let selectedText = fullText.substring(with: range)
+                if selectedText.hasPrefix("**") && selectedText.hasSuffix("**") && selectedText.count >= 4 {
+                    isBold = true
+                }
+                if selectedText.hasPrefix("*") && selectedText.hasSuffix("*") && selectedText.count >= 2 {
+                    isItalic = true
+                }
+                if selectedText.hasPrefix("~~") && selectedText.hasSuffix("~~") && selectedText.count >= 4 {
+                    isStrike = true
+                }
+                if selectedText.hasPrefix("<u>") && selectedText.hasSuffix("</u>") && selectedText.count >= 7 {
+                    isUnder = true
+                }
+            }
+        }
+        
+        notepadDelegate?.textViewDidChangeFormatting(bold: isBold, italic: isItalic, strikethrough: isStrike, underline: isUnder)
     }
     
     // Windows F5 feature: Time and Date insertion
