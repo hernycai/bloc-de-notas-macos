@@ -10,8 +10,16 @@ if [ ! -f "AppIcon.icns" ]; then
     iconutil -c icns AppIcon.iconset -o AppIcon.icns
 fi
 
-echo "==> Compilando Bloc de notas (Swift nativo)..."
-swiftc -O src/*.swift -o "Bloc de notas"
+echo "==> Compilando Bloc de notas para Apple Silicon (arm64)..."
+swiftc -target arm64-apple-macos11.0 -O src/*.swift -o "Bloc de notas_arm64"
+
+echo "==> Compilando Bloc de notas para Intel (x86_64)..."
+swiftc -target x86_64-apple-macos11.0 -O src/*.swift -o "Bloc de notas_x86_64"
+
+echo "==> Creando binario Universal 2 (arm64 + x86_64)..."
+lipo -create -output "Bloc de notas" "Bloc de notas_arm64" "Bloc de notas_x86_64"
+rm -f "Bloc de notas_arm64" "Bloc de notas_x86_64"
+lipo -info "Bloc de notas"
 
 echo "==> Empaquetando Bloc de notas.app..."
 APP_DIR="Bloc de notas.app"
